@@ -22,7 +22,7 @@ def calcTotalDist(a):
         cumDist += dist
     return cumDist
 
-# Test again
+# Test
 
 if __name__ == '__main__':
     pass
