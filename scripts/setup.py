@@ -6,7 +6,6 @@ Setup functions for the IMOD models into a Pandas dataframe.
 
 import subprocess
 import os.path
-import re
 import pandas as pd
 
 def model2point(file_list: list) -> list:
@@ -30,7 +29,7 @@ def model2point(file_list: list) -> list:
         for item in file_prefix:
             name += item + '_'
 
-        file_path = '../__model_cache__/'
+        file_path = os.path.realpath(os.path.dirname(__file__)) + '/../__model_cache__/'
         file_name = name + file.split('/')[-1].split('.')[0] + '.txt' 
 
         # Run model2point on the models, if the text files don't already exit
@@ -86,6 +85,9 @@ def test_makeDateframe():
                    '/ChangLab1-hd3/matt/GUI_IMOD_models/test_models/MV_model2.mod',
                    '/ChangLab1-hd3/matt/GUI_IMOD_models/test_models/MV_model3.mod',
                    '/ChangLab1-hd3/matt/GUI_IMOD_models/test_models/MV_model4.mod'])
+    
+def test_printcwd():
+    print(os.path.realpath(os.path.dirname(__file__)) + '/../__model_cache__/')
 
 if __name__ == '__main__':
     test_makeDateframe()

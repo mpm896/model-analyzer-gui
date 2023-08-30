@@ -9,7 +9,7 @@ import os
 import scripts.utils as u
 import scripts.setup as setup
 import scripts.analyze as a
-
+import itertools
 
 # Create the window layout. Just one column might be necessary
 
@@ -67,6 +67,7 @@ window["-MODEL NAME-"].bind("<Return>", "_Enter") # The keybind must be done aft
 
 # Initialize the dataframes
 df_list = []
+keys_list = []
 
 # Event loop
 while True:
@@ -110,12 +111,19 @@ while True:
         window["-FILE LIST-"].update(file_list)
         
     # Display Dataframe names in the dataframe box when hit the "make dataframe" button
-    if event == 'Make Dataframe':
+    if event == 'Make Dataframe': 
         try:
-            if setup.makeDataframe(file_list) not in df_list:
-                df_list.append(setup.makeDataframe(file_list))
+            df = setup.makeDataframe(file_list)
+            if list(df.keys()) not in keys_list:
+                df_list.append(df)
+                keys_list.append(list(df.keys()))
         except NameError:
             pass
+        
+        ##### WITH COLORING CERTAIN VALUES WORKING, CREATE FUNCTION TO COLOR MODELS BY TYPE #####
+        window["-DATAFRAME LIST-"].update(list(itertools.chain(*keys_list)))
+        window["-DATAFRAME LIST-"].values=list(itertools.chain(*keys_list))
+        window["-DATAFRAME LIST-"].set_index_color(1, 'white', 'red')
         
             
     if event == "-FILE LIST-":
