@@ -31,7 +31,7 @@ file_list_column = [
         sg.Button(button_text='Make Dataframe', size=(9,2))
     ],
     [
-        sg.Button('Remove')
+        sg.Button('Remove'), sg.Push()
     ]
 ]
 
@@ -41,6 +41,9 @@ dataframe_list_column = [
     ],
     [
         sg.Listbox(values=[], enable_events=True, size=(30,15), key="-DATAFRAME LIST-", horizontal_scroll=True)
+    ],
+    [
+        sg.Push(), sg.Button('Create Table'), sg.Push()
     ]
 ]
 
@@ -65,13 +68,22 @@ layout = [
 window = sg.Window(title="IMOD Model Analyzer", layout=layout, finalize=True)
 window["-MODEL NAME-"].bind("<Return>", "_Enter") # The keybind must be done after the window initialization is finalized
 
-# Initialize the dataframes
+# Initialize the important lists
+file_list = []
 df_list = []
 keys_list = []
 
 # Event loop
 while True:
     event, values = window.read()
+    try:
+        df_event, df_values = df_window.read()
+    except NameError:
+        pass
+
+###############################################
+##### ---------- WINDOW EVENTS ---------- #####
+###############################################
 
     if event == "Exit" or event == sg.WIN_CLOSED:
         break
@@ -104,6 +116,12 @@ while True:
             file_list = []
         window["-FILE LIST-"].update(file_list)
 
+    if event == "-FILE LIST-":
+        pass
+
+###############################################
+##### ---------- BUTTON EVENTS ---------- #####
+###############################################
 
     # Event for removing a model from the list
     if event == 'Remove':
@@ -113,21 +131,40 @@ while True:
     # Display Dataframe names in the dataframe box when hit the "make dataframe" button
     if event == 'Make Dataframe': 
         try:
-            df = setup.makeDataframe(file_list)
+            df, headers = setup.makeDataframe(file_list)
             if list(df.keys()) not in keys_list:
                 df_list.append(df)
                 keys_list.append(list(df.keys()))
         except NameError:
             pass
         
-        ##### WITH COLORING CERTAIN VALUES WORKING, CREATE FUNCTION TO COLOR MODELS BY TYPE #####
         window["-DATAFRAME LIST-"].update(list(itertools.chain(*keys_list)))
         window["-DATAFRAME LIST-"].values=list(itertools.chain(*keys_list))
-        window["-DATAFRAME LIST-"].set_index_color(1, 'white', 'red')
+        
+        u.color_dataframe_sets(keys_list, window["-DATAFRAME LIST-"]) # Color dataframes by set
+
+
+
+    ###################################
+    ####### CREATE FUNCTION FOR #######
+    ### POPUP WINDOW FOR DATAFRAMES ###
+    ###################################
+    if event == 'Create Table':
+        # Don't attempt to make tables if there are no dataframes
+        if len(df_list) == 0:
+            pass
+        else:
+            values = df_list[0][window["-DATAFRAME LIST-"].values[0]].values.tolist()
+
+            df_layout = [[
+                sg.Table(values=values, headings=headers)
+            ]]
+
+            df_window = sg.Window('Sample dataframe window', df_layout)
+            
         
             
-    if event == "-FILE LIST-":
-        pass
+
 
 
 window.close()

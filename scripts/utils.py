@@ -6,7 +6,7 @@ Useful functions for the IMOD model analyzer
 
 import os
 
-def read_models(path, name=None):
+def read_models(path, name=None) -> list:
     '''
     Read the filenames of all the specified model files.
     If given a specifc filename, use "find" from the specified directory.
@@ -28,16 +28,49 @@ def read_models(path, name=None):
 
     return(model_files)
 
-def remove_model(file_list, window_values):
+def remove_model(file_list, window_values) -> None:
     '''
     Remove a model from the file list if the user chooses to do so.
-    Return a modified list of file names
+    
     Args: file_list - a list of file names
           window_valuse - values from window.read() 
     '''
     if len(file_list) > 0:
-        val = window_values["-FILE LIST-"][0] # Gives the value of what's currently selected from the file list
-        file_list.remove(val)
+        try:
+            val = window_values["-FILE LIST-"][0] # Gives the value of what's currently selected from the file list
+            print(val)
+            file_list.remove(val)
+        except IndexError:
+            pass
+
+def color_dataframe_sets(keys: list, dataframes) -> None:
+    '''
+    Function to highlight Dataframes in the Dataframe window
+    by model type. For example, you make a set of models on wildtype cells and
+    a similar set of models on a mutant. Highlight the wildtype dataframes 
+    one color,  and the mutant dataframes another.
+
+    Args:   keys - 2D list of dataframe keys
+            dataframes - Listbox object from window["-DATAFRAME LIST-"] 
+
+    '''
+    colors = ['skyblue', 'silver', 'mediumslateblue', 'yellow',
+              'magenta', 'violet', 'slategray', 'sandybrown',
+              'aqua', 'orchid', 'slateblue', 'lightgray']
+    color_count = 0 # Track colors used
+    index_count = 0 # Track items colored
+    for model in keys:
+        color = colors[color_count]
+        for i in range(len(model)):
+            dataframes.set_index_color(index_count, 'white', color)
+            index_count += 1
+        color_count += 1
+
+        
+
+
+
+    pass
     
 def test_read_models():
     read_models('/ChangLab1-hd3/matt/Toxoplasma/ROPx','MV_model')

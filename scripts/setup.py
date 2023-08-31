@@ -40,7 +40,7 @@ def model2point(file_list: list) -> list:
 
     return new_file_list
 
-def makeDataframe(file_list: list) -> dict:
+def makeDataframe(file_list: list) -> [dict, list]:
 
     '''
     From the IMOD models converted to text files, create
@@ -73,7 +73,8 @@ def makeDataframe(file_list: list) -> dict:
             count += 1
 
         models_dataFrame[file.split('/')[-1]] = df
-    return models_dataFrame
+    
+    return models_dataFrame, df.columns.tolist()
 
 
 
