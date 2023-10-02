@@ -107,8 +107,12 @@ while True:
 ##### -------- DATAFRAMES EVENTS -------- #####
 ###############################################
 
+    rowValues = []
     if "-DF TABLE-" in event:
-        print(dataFrameWindow[event].Values[values[event][0]])
+        rowValues = dataFrameWindow[event].Values[values[event][0]:values[event][None]]
+
+        print(values[event])
+    print(rowValues)
 
     print(window, event, values)
 
