@@ -19,11 +19,17 @@ def model2point(file_list: list) -> list:
 
     Args: file_list - list of file names
     '''
+    # Remove the common path from the files
+    common = os.path.commonpath(file_list)
+
     new_file_list = []
     for file in file_list:
-        file_prefix = file.split('/')[:-1]
-        file_prefix.pop(0)
-
+        name = file.replace(common, '')
+        file_prefix = name.split('/')[:-1]
+        
+        if file_prefix[0] == '':
+            file_prefix.pop(0)
+        
         # Create new file path and name
         name = ''
         for item in file_prefix:

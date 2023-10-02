@@ -4,7 +4,50 @@ Useful functions for the IMOD model analyzer
 @author: Matt Martinez
 '''
 
+import PySimpleGUI as sg
 import os
+
+DEFAULT_WINDOW_SIZE = (867, 422)
+
+def make_window(layout: list, title: str = None, size: tuple = DEFAULT_WINDOW_SIZE) -> sg.Window:
+    return sg.Window(title=title, layout=layout, 
+                     finalize=True, resizable=True, 
+                     size=size)
+
+def make_dataframe_window(df_list: list, title: str = None) -> sg.Window:
+    '''
+    Create a window with tabs, each containing a Pandas DataFrame
+    Args: df_list - List containing groups of Pandas DataFrames
+    '''
+
+    layouts = {}
+    for df in df_list:
+        for key in df:
+            pre_values = df[key].values.astype('object')
+            pre_values[:,0:2] = pre_values[:,0:2].astype('int')
+            values = pre_values.tolist()
+
+            df_layout = [[
+                sg.Table(values=values, headings=df[key].columns.tolist(),
+                        key=f"-DF TABLE-", enable_events=True,
+                        expand_x=True, expand_y=True,
+                        select_mode='extended')
+            ]]
+            layouts[key] = df_layout
+
+
+
+    tabgroup = [[sg.Tab(key, layouts[key], key=key, tooltip=f'{key}') for key in layouts]]
+    tableLayout = [[
+            sg.TabGroup(tabgroup, key='TabGroup', 
+                        expand_x=True, expand_y=True,
+                        enable_events=True)
+        ]]
+    
+    return make_window(tableLayout, title=title)
+    
+
+
 
 def read_models(path, name=None) -> list:
     '''
@@ -65,12 +108,6 @@ def color_dataframe_sets(keys: list, dataframes) -> None:
             dataframes.set_index_color(index_count, 'white', color)
             index_count += 1
         color_count += 1
-
-        
-
-
-
-    pass
     
 def test_read_models():
     read_models('/ChangLab1-hd3/matt/Toxoplasma/ROPx','MV_model')

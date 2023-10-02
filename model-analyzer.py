@@ -5,68 +5,18 @@ Main script for the IMOD model analyzer GUI
 '''
 
 import PySimpleGUI as sg
-import os
+import os, sys
+import scripts.initialWindow as initWin
 import scripts.utils as u
 import scripts.setup as setup
 import scripts.analyze as a
 import itertools
 
-# Create the window layout. Just one column might be necessary
-
-file_selection_column = [
-    [
-        sg.Text("Enter common model name (or leave blank):"),
-        sg.In(size=(25,1), enable_events=True ,key="-MODEL NAME-")
-    ],
-    [
-        sg.Text("Select a folder:"),
-        sg.In(size=(25,1), enable_events=True, key="-FOLDER-"),
-        sg.FolderBrowse(button_text='Browse for parent folder', initial_folder='.')
-    ]
-]
-
-file_list_column = [
-    [
-        sg.Listbox(values=[], enable_events=True, size=(40,20), key="-FILE LIST-", horizontal_scroll=True),
-        sg.Button(button_text='Make Dataframe', size=(9,2))
-    ],
-    [
-        sg.Button('Remove'), sg.Push()
-    ]
-]
-
-dataframe_list_column = [
-    [
-        sg.Text("Dataframes", font=(None, 15, 'underline'))
-    ],
-    [
-        sg.Listbox(values=[], enable_events=True, size=(30,15), key="-DATAFRAME LIST-", horizontal_scroll=True)
-    ],
-    [
-        sg.Push(), sg.Button('Create Table'), sg.Push()
-    ]
-]
-
-# ------- FULL LAYOUT ------- #
-
-layout = [
-
-    [
-        sg.Push(), sg.Column(file_selection_column), sg.Push()
-    ],
-    [
-        sg.HSeparator()
-    ],
-    [
-        sg.Column(file_list_column, element_justification='c'),
-        sg.VSeparator(),
-        sg.VPush(), sg.Column(dataframe_list_column, element_justification='c'), sg.VPush()
-    ]
-]
+layout = initWin.get_initial_layout()
 
 # Create the window and bind keys
-window = sg.Window(title="IMOD Model Analyzer", layout=layout, finalize=True)
-window["-MODEL NAME-"].bind("<Return>", "_Enter") # The keybind must be done after the window initialization is finalized
+initWindow = sg.Window(title="IMOD Model Analyzer", layout=layout, finalize=True)
+initWindow["-MODEL NAME-"].bind("<Return>", "_Enter") # The keybind must be done after the window initialization is finalized
 
 # Initialize the important lists
 file_list = []
@@ -75,18 +25,17 @@ keys_list = []
 
 # Event loop
 while True:
-    event, values = window.read()
-    try:
-        df_event, df_values = df_window.read()
-    except NameError:
-        pass
+    # event, values = window.Read()
+    window, event, values = sg.read_all_windows()
 
 ###############################################
 ##### ---------- WINDOW EVENTS ---------- #####
 ###############################################
 
     if event == "Exit" or event == sg.WIN_CLOSED:
-        break
+        if window == initWindow:
+            sys.exit()
+        window.close()
     
     # Get model name from the box
     if event == "-MODEL NAME-": 
@@ -97,7 +46,7 @@ while True:
             file_list = u.read_models(folder, model_name)
         except:
             file_list = []
-        window["-FILE LIST-"].update(file_list)
+        initWindow["-FILE LIST-"].update(file_list)
 
     # Event for folder selection
     if event == "-FOLDER-":
@@ -114,7 +63,7 @@ while True:
             file_list = u.read_models(folder, model_name)
         except:
             file_list = []
-        window["-FILE LIST-"].update(file_list)
+        initWindow["-FILE LIST-"].update(file_list)
 
     if event == "-FILE LIST-":
         pass
@@ -126,7 +75,7 @@ while True:
     # Event for removing a model from the list
     if event == 'Remove':
         u.remove_model(file_list, values)
-        window["-FILE LIST-"].update(file_list)
+        initWindow["-FILE LIST-"].update(file_list)
         
     # Display Dataframe names in the dataframe box when hit the "make dataframe" button
     if event == 'Make Dataframe': 
@@ -138,33 +87,30 @@ while True:
         except NameError:
             pass
         
-        window["-DATAFRAME LIST-"].update(list(itertools.chain(*keys_list)))
-        window["-DATAFRAME LIST-"].values=list(itertools.chain(*keys_list))
+        initWindow["-DATAFRAME LIST-"].update(list(itertools.chain(*keys_list)))
+        initWindow["-DATAFRAME LIST-"].values=list(itertools.chain(*keys_list))
         
-        u.color_dataframe_sets(keys_list, window["-DATAFRAME LIST-"]) # Color dataframes by set
+        u.color_dataframe_sets(keys_list, initWindow["-DATAFRAME LIST-"]) # Color dataframes by set
 
+###############################################
+##### ---- CREATE DATAFRAMES WINDOW ----- #####
+###############################################
 
-
-    ###################################
-    ####### CREATE FUNCTION FOR #######
-    ### POPUP WINDOW FOR DATAFRAMES ###
-    ###################################
     if event == 'Create Table':
         # Don't attempt to make tables if there are no dataframes
         if len(df_list) == 0:
             pass
         else:
-            values = df_list[0][window["-DATAFRAME LIST-"].values[0]].values.tolist()
+            dataFrameWindow = u.make_dataframe_window(df_list, title="DataFrames")
 
-            df_layout = [[
-                sg.Table(values=values, headings=headers)
-            ]]
+###############################################
+##### -------- DATAFRAMES EVENTS -------- #####
+###############################################
 
-            df_window = sg.Window('Sample dataframe window', df_layout)
-            
+    if "-DF TABLE-" in event:
+        print(dataFrameWindow[event].Values[values[event][0]])
+
+    print(window, event, values)
+
+
         
-            
-
-
-
-window.close()
