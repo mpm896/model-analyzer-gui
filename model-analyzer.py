@@ -5,12 +5,14 @@ Main script for the IMOD model analyzer GUI
 '''
 
 import PySimpleGUI as sg
-import os, sys
-import scripts.initialWindow as initWin
+import sys
+import setup.initialWindow as initWin
+import setup.windowSetup as setWin
 import scripts.utils as u
 import scripts.setup as setup
 import scripts.analyze as a
 import itertools
+import time
 
 layout = initWin.get_initial_layout()
 
@@ -25,7 +27,6 @@ keys_list = []
 
 # Event loop
 while True:
-    # event, values = window.Read()
     window, event, values = sg.read_all_windows()
 
 ###############################################
@@ -101,20 +102,24 @@ while True:
         if len(df_list) == 0:
             pass
         else:
-            dataFrameWindow = u.make_dataframe_window(df_list, title="DataFrames")
+            # Tried to save time by creating a cache of data tables.
+            # In the end, the actual creation of the window is what takes the longest
+            dataFrameWindow = setWin.make_dataframe_window(df_list, title="DataFrames")
 
 ###############################################
 ##### -------- DATAFRAMES EVENTS -------- #####
 ###############################################
+    
+    if event and "-DF TABLE-" in event:
+        rowValues = []
+        for row in values[event]:
+            rowValues.append(dataFrameWindow[event].Values[row])
 
-    rowValues = []
-    if "-DF TABLE-" in event:
-        rowValues = dataFrameWindow[event].Values[values[event][0]:values[event][None]]
+###############################################
+##### ----- CREATE PLOTTING WINDOW ------ #####
+###############################################
 
-        print(values[event])
-    print(rowValues)
-
-    print(window, event, values)
-
-
+    if event == 'Plot':
+        ''' Make new plotting window with options for making individual plots '''
+        pass
         

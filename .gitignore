@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 
 # Extra directories
-__model_cache__/
+.data/
 learning/
 test_models/
 
