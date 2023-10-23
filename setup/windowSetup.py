@@ -51,7 +51,25 @@ def make_dataframe_window(df_list: list, title: str = None) -> sg.Window:
     
     return make_window(tableLayout, title=title)
 
-def make_plotting_window(df_list: list, title: str = None) -> sg.Window:
+
+def make_annotation_window(df_list: list, title: str=None) -> sg.Window:
+    ''' Window for annotating model objects. Allow user to input annotation once if all are the same,
+        or input object annotations model by model  '''
+    objects = dict()  # Keep track of objects for use, if they want to annotate all at once or for each model
+    max = 0
+    for df in df_list:
+        name = list(df.keys())[0]
+        df = list(df.values())[0]  # Get dataframe object
+        num_objects = df['Ob'].unique()
+        if (len_objects := num_objects) > max:
+            max = len_objects
+
+        objects[name] = num_objects
+    ### Add a loop to create a column for the number of objects, with an input box for each object ###
+    layout = [[sg.Push(), sg.Radio("Annotate all models", default=True), sg.Push()]
+              [sg.Push()]] # Filler column with the push object
+
+def make_plotting_window(df_list: list, title: str=None) -> sg.Window:
     '''
     Make a window giving the user options for plotting their 
     data from the dataframes

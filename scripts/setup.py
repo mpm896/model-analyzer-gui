@@ -19,27 +19,29 @@ def model2point(file_list: list) -> list:
 
     Args: file_list - list of file names
     '''
+    # Get current file path
+    file_path = os.path.realpath(os.path.dirname(__file__)) + '/../.data/__model_cache__/'
     # Remove the common path from the files
     common = os.path.commonpath(file_list)
-
     new_file_list = []
     for file in file_list:
-        name = file.replace(common, '')
-        file_prefix = name.split('/')[:-1]
+        if len(file_list) == 1:
+            file_name = file.split("/")[-1].split(".")[0] + '.txt'
+        else:
+            name = file.replace(common, '')
+            file_prefix = name.split('/')[:-1]
+            if file_prefix[0] == '':
+                file_prefix.pop(0)
         
-        if file_prefix[0] == '':
-            file_prefix.pop(0)
-        
-        # Create new file path and name
-        name = ''
-        for item in file_prefix:
-            name += item + '_'
-
-        file_path = os.path.realpath(os.path.dirname(__file__)) + '/../.data/__model_cache__/'
-        file_name = name + file.split('/')[-1].split('.')[0] + '.txt' 
+            # Create new file name
+            name = ''
+            for item in file_prefix:
+                name += item + '_'
+            file_name = name + file.split('/')[-1].split('.')[0] + '.txt'
 
         # Run model2point on the models, if the text files don't already exit
         if not os.path.isfile(f'{file_path}{file_name}'):
+            print(f"Running command: model2point -ob {file} {file_path}{file_name}")
             process = subprocess.run(['model2point', '-ob', f'{file}', f'{file_path}{file_name}'])
         
         new_file_list.append(f'{file_path}{file_name}')

@@ -105,6 +105,7 @@ while True:
             # Tried to save time by creating a cache of data tables.
             # In the end, the actual creation of the window is what takes the longest
             dataFrameWindow = setWin.make_dataframe_window(df_list, title="DataFrames")
+            setWin.make_annotation_window(df_list)
 
 ###############################################
 ##### -------- DATAFRAMES EVENTS -------- #####
