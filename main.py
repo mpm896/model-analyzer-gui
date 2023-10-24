@@ -29,9 +29,9 @@ keys_list = []
 while True:
     window, event, values = sg.read_all_windows()
 
-###############################################
-##### ---------- WINDOW EVENTS ---------- #####
-###############################################
+    ###############################################
+    ##### ---------- WINDOW EVENTS ---------- #####
+    ###############################################
 
     if event == "Exit" or event == sg.WIN_CLOSED:
         if window == initWindow:
@@ -69,9 +69,9 @@ while True:
     if event == "-FILE LIST-":
         pass
 
-###############################################
-##### ---------- BUTTON EVENTS ---------- #####
-###############################################
+    ###############################################
+    ##### ---------- BUTTON EVENTS ---------- #####
+    ###############################################
 
     # Event for removing a model from the list
     if event == 'Remove':
@@ -93,9 +93,9 @@ while True:
         
         u.color_dataframe_sets(keys_list, initWindow["-DATAFRAME LIST-"]) # Color dataframes by set
 
-###############################################
-##### ---- CREATE DATAFRAMES WINDOW ----- #####
-###############################################
+    ###############################################
+    ##### ---- CREATE DATAFRAMES WINDOW ----- #####
+    ###############################################
 
     if event == 'Create Table':
         # Don't attempt to make tables if there are no dataframes
@@ -107,18 +107,18 @@ while True:
             dataFrameWindow = setWin.make_dataframe_window(df_list, title="DataFrames")
             setWin.make_annotation_window(df_list)
 
-###############################################
-##### -------- DATAFRAMES EVENTS -------- #####
-###############################################
+    ###############################################
+    ##### -------- DATAFRAMES EVENTS -------- #####
+    ###############################################
     
     if event and "-DF TABLE-" in event:
         rowValues = []
         for row in values[event]:
             rowValues.append(dataFrameWindow[event].Values[row])
 
-###############################################
-##### ----- CREATE PLOTTING WINDOW ------ #####
-###############################################
+    ###############################################
+    ##### ----- CREATE PLOTTING WINDOW ------ #####
+    ###############################################
 
     if event == 'Plot':
         ''' Make new plotting window with options for making individual plots '''

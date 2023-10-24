@@ -102,13 +102,15 @@ def read_table(key: str) -> [list[str], list]:
         values (list): The list of rows with values
     '''
     basename = key.replace('.txt', '')
+    if not basename.endswith('.csv'):
+        basename = f'{basename}.csv'
 
     # Check if file exists
-    if not os.path.isfile(f'{TABLE_PATH}{basename}.csv'):
+    if not os.path.isfile(f'{TABLE_PATH}{basename}'):
         # File does not exist
         return
 
-    with open(f'{TABLE_PATH}{basename}.csv', newline='') as csvfile:
+    with open(f'{TABLE_PATH}{basename}', newline='') as csvfile:
         reader = csv.reader(csvfile)
         headers = next(reader)
         values = list(reader)
